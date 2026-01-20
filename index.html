@@ -14,91 +14,56 @@
 	
     <style>
         :root { --bg: #f8f9fa; --card: #ffffff; --accent: #007aff; }
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; overflow-x: hidden; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); margin: 0; overflow: hidden; }
 
-        /* --- HEADER E RICERCA --- */
-        .header-lista {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            gap: 15px;
-        }
-        .header-lista h2 {
-            margin: 0;
-            font-weight: bold;
-            font-size: 1.4rem;
-            white-space: nowrap;
-        }
-        #search-input {
-            width: 100%;
-            max-width: 180px;
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-            font-size: 0.95rem;
-            outline: none;
-            -webkit-appearance: none;
-        }
+        /* --- LISTA PRINCIPALE --- */
+        #lista-paesi { padding: 20px; max-width: 600px; margin: 0 auto; height: 100vh; overflow-y: auto; box-sizing: border-box; }
+        .header-lista { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 10px; }
+        .header-lista h2 { margin: 0; font-weight: bold; font-size: 1.4rem; }
+        #search-input { width: 100%; max-width: 180px; padding: 10px; border-radius: 10px; border: 1px solid #ddd; outline: none; }
 
-        /* --- LISTA PAESI --- */
-        #lista-paesi { padding: 20px; max-width: 600px; margin: 0 auto; }
         .lista-item {
             display: flex; align-items: center; background: white; padding: 12px;
             margin-bottom: 8px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            cursor: pointer; transition: transform 0.2s;
+            cursor: pointer;
         }
-        .lista-item:active { transform: scale(0.98); }
         .bandiera-mini { width: 40px; height: 25px; object-fit: cover; border-radius: 4px; margin-right: 15px; border: 1px solid #eee; }
-        .nome-paese-lista { font-size: 1.1rem; font-weight: 500; color: #333; }
+        .nome-paese-lista { font-size: 1.1rem; font-weight: 500; }
 
-        /* --- CONTENITORE SCHEDE (FULLSCREEN) --- */
-        #cards-container {
-            display: none; scroll-snap-type: x mandatory; overflow-x: scroll;
-            display: flex; width: 100vw; height: 100vh; scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch; background: #000;
-        }
-        #cards-container::-webkit-scrollbar { display: none; }
-
-        .card {
-            min-width: 100vw; height: 100vh; scroll-snap-align: start;
-            background: white; box-sizing: border-box; overflow-y: auto;
-            display: flex; flex-direction: column; align-items: center; position: relative;
+        /* --- SCHEDA DETTAGLIO (UNICA PER TUTTI) --- */
+        #scheda-dettaglio {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; display: none; flex-direction: column; z-index: 1000;
+            overflow-y: auto;
         }
 
-        /* --- DETTAGLI CARD --- */
-        .bandiera-grande { width: 100%; max-height: 250px; object-fit: contain; background: #f8f9fa; margin-top: 10px; }
-        h1 { margin: 15px 0 5px 0; font-size: 1.8rem; color: #1c1c1e; text-align: center; }
-        h3 { margin: 0 0 20px 0; font-weight: 400; color: #8e8e93; text-align: center; }
-
-        .info-paese { width: 90%; max-width: 450px; }
+        .bandiera-grande { width: 100%; max-height: 250px; object-fit: contain; background: #f8f9fa; padding-top: 40px; }
+        .info-container { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .info-paese { width: 100%; max-width: 450px; }
         .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f2f2f7; font-size: 0.95rem; }
         .label { color: #8e8e93; }
-        .value { color: #1c1c1e; font-weight: 500; text-align: right; padding-left: 10px; }
+        .value { color: #1c1c1e; font-weight: 500; text-align: right; }
 
-        /* --- REGIME STYLE --- */
         .regime-center {
-            width: 90%; text-align: center; font-weight: bold; font-size: 1.2rem;
-            padding: 20px 0; margin: 10px 0; border-top: 1px solid #f2f2f7;
+            width: 100%; text-align: center; font-weight: bold; font-size: 1.2rem;
+            padding: 20px 0; margin-top: 10px;
         }
 
-        /* --- WIKIPEDIA IFRAME --- */
-        .wiki-container { width: 100%; flex-grow: 1; min-height: 500px; border-top: 2px solid #eee; }
-        .wiki-container iframe { width: 100%; height: 100%; border: none; }
+        /* --- WIKIPEDIA --- */
+        .wiki-container { width: 100%; min-height: 600px; border-top: 2px solid #eee; background: #fff; }
+        #wiki-frame { width: 100%; height: 100%; border: none; min-height: 600px; }
 
-        /* BOTTONE CHIUDI */
         #btn-back {
-            position: fixed; top: 20px; right: 20px; z-index: 100;
+            position: fixed; top: 15px; right: 15px; z-index: 2000;
             background: rgba(0,0,0,0.6); color: white; border: none;
-            padding: 8px 16px; border-radius: 20px; cursor: pointer;
-            font-size: 14px; backdrop-filter: blur(10px); display: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            padding: 8px 16px; border-radius: 20px; font-weight: bold;
+            backdrop-filter: blur(10px);
         }
     </style>
 </head>
 <body>
 
-    <button id="btn-back" onclick="mostraLista()">✕ Chiudi</button>
+    <button id="btn-back" style="display:none;" onclick="chiudiScheda()">✕ Chiudi</button>
 
     <div id="lista-paesi">
         <div class="header-lista">
@@ -108,13 +73,20 @@
         <div id="lista-items"></div>
     </div>
 
-    <div id="cards-container" style="display: none;"></div>
+    <div id="scheda-dettaglio">
+        <div id="contenuto-scheda">
+            </div>
+        <div class="wiki-container">
+            <iframe id="wiki-frame" src=""></iframe>
+        </div>
+    </div>
 
     <script src="dati.js"></script>
     <script>
-        const listaSezione = document.getElementById('lista-paesi');
         const listaItemsContainer = document.getElementById('lista-items');
-        const cardsContainer = document.getElementById('cards-container');
+        const schedaDettaglio = document.getElementById('scheda-dettaglio');
+        const contenutoScheda = document.getElementById('contenuto-scheda');
+        const wikiFrame = document.getElementById('wiki-frame');
         const btnBack = document.getElementById('btn-back');
 
         function getRegimeColor(regime) {
@@ -127,14 +99,13 @@
             return "#8e8e93";
         }
 
-        // 1. Funzione per generare la lista filtrabile
         function generaLista(filtro = "") {
             listaItemsContainer.innerHTML = "";
             paesi.forEach((p, index) => {
                 if (p.Paese.toLowerCase().includes(filtro.toLowerCase())) {
                     const item = document.createElement('div');
                     item.className = 'lista-item';
-                    item.onclick = () => mostraScheda(index);
+                    item.onclick = () => apriScheda(index);
                     item.innerHTML = `
                         <img src="${p.Bandiera}" class="bandiera-mini">
                         <span class="nome-paese-lista">${p.Paese}</span>
@@ -149,17 +120,15 @@
             generaLista(testo);
         }
 
-        // 2. Genera le Card Fullscreen all'avvio
-        function creaCards() {
-            paesi.forEach((p, index) => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.id = 'card-' + index;
-                
-                card.innerHTML = `
-                    <img src="${p.Bandiera}" class="bandiera-grande">
-                    <h1>${p.Paese}</h1>
-                    <h3>${p.Capitale}</h3>
+        function apriScheda(index) {
+            const p = paesi[index];
+            
+            // Inietta i dati testuali
+            contenutoScheda.innerHTML = `
+                <img src="${p.Bandiera}" class="bandiera-grande">
+                <div class="info-container">
+                    <h1 style="margin:0;">${p.Paese}</h1>
+                    <h3 style="color:#8e8e93; font-weight:400; margin-bottom:20px;">${p.Capitale}</h3>
                     
                     <div class="info-paese">
                         <div class="row"><span class="label">Continente</span><span class="value">${p["Continente"]}</span></div>
@@ -175,33 +144,28 @@
                     <div class="regime-center" style="color: ${getRegimeColor(p["Tipo di regime"])}">
                         ${p["Tipo di regime"]}
                     </div>
+                </div>
+            `;
 
-                    <div class="wiki-container">
-                        <iframe src="${p.Wikipedia}" loading="lazy"></iframe>
-                    </div>
-                `;
-                cardsContainer.appendChild(card);
-            });
-        }
-
-        function mostraScheda(index) {
-            listaSezione.style.display = 'none';
-            cardsContainer.style.display = 'flex';
-            btnBack.style.display = 'block';
+            // Carica l'iframe solo ora
+            wikiFrame.src = p.Wikipedia;
             
-            const targetCard = document.getElementById('card-' + index);
-            targetCard.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'center' });
+            // Mostra la scheda
+            schedaDettaglio.style.display = 'flex';
+            btnBack.style.display = 'block';
+            schedaDettaglio.scrollTop = 0;
         }
 
-        function mostraLista() {
-            listaSezione.style.display = 'block';
-            cardsContainer.style.display = 'none';
+        function chiudiScheda() {
+            schedaDettaglio.style.display = 'none';
             btnBack.style.display = 'none';
+            // Svuota l'iframe per liberare memoria
+            wikiFrame.src = "";
+            contenutoScheda.innerHTML = "";
         }
 
-        // Inizializzazione
+        // Inizio
         generaLista();
-        creaCards();
     </script>
 </body>
 </html>
